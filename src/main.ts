@@ -87,7 +87,9 @@ function openConfigWindow(): void {
 }
 
 function createTray(): void {
-  const iconPath = path.join(app.getAppPath(), 'icone.png');
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'icone.png')
+    : path.join(app.getAppPath(), 'icone.png');
   const icon = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(icon.resize({ width: 16, height: 16 }));

@@ -53,6 +53,18 @@
   </head>
   <body>
     <section>
+      <h2>Cards visíveis</h2>
+      <div style="display:flex;gap:18px;margin-top:8px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#f4f7ff;font-size:13px;">
+          <input type="checkbox" id="cardClaude" checked /> Claude
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#f4f7ff;font-size:13px;">
+          <input type="checkbox" id="cardCodex" checked /> Codex
+        </label>
+      </div>
+    </section>
+
+    <section>
       <h2>Claude</h2>
       <div class="field">
         <label for="orgId">Organization ID</label>
@@ -86,6 +98,8 @@
       const btnSelect = $('#btnSelect');
       const btnSave = $('#btnSave');
       const btnCancel = $('#btnCancel');
+      const cardClaude = $('#cardClaude');
+      const cardCodex = $('#cardCodex');
 
       let openaiJsonPath = '';
 
@@ -97,6 +111,9 @@
           filePath.textContent = openaiJsonPath;
           filePath.classList.add('has-value');
         }
+        const cards = (cfg.CARDS || 'claude,codex').toLowerCase().split(',').map(c => c.trim());
+        cardClaude.checked = cards.includes('claude');
+        cardCodex.checked = cards.includes('codex');
       });
 
       btnSelect.addEventListener('click', async () => {
@@ -109,10 +126,15 @@
       });
 
       btnSave.addEventListener('click', async () => {
+        const selectedCards = [];
+        if (cardClaude.checked) selectedCards.push('claude');
+        if (cardCodex.checked) selectedCards.push('codex');
+
         await window.configApi.save({
           CLAUDE_ORGANIZATION_ID: orgId.value.trim(),
           CLAUDE_COOKIE: cookie.value.trim(),
           OPENAI_JSON_PATH: openaiJsonPath.trim(),
+          CARDS: selectedCards.join(','),
         });
       });
 

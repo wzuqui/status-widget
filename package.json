@@ -24,6 +24,9 @@
       "src/config.html",
       "package.json"
     ],
+    "extraResources": [
+      "icone.png"
+    ],
     "win": {
       "icon": "icone.png",
       "target": "msi",
