@@ -28,17 +28,9 @@ jobs:
         run: npm ci
 
       - name: Build distributable
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
         run: npm run dist
-
-      - name: Archive distributable
-        shell: pwsh
-        run: |
-          $source = "dist-release/Status Widget-win32-x64/*"
-          $destination = "dist-release/status-widget-win32-x64.zip"
-          if (Test-Path $destination) {
-            Remove-Item $destination -Force
-          }
-          Compress-Archive -Path $source -DestinationPath $destination
 
       - name: Semantic release
         env:

@@ -21,8 +21,8 @@
       {
         "assets": [
           {
-            "path": "dist-release/status-widget-win32-x64.zip",
-            "label": "Status Widget Windows x64"
+            "path": "dist-release/*.msi",
+            "label": "Status Widget Windows x64 (MSI)"
           }
         ]
       }

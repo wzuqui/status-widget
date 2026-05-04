@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "description": "Always-on-top Electron status widget for Claude and Codex usage.",
+  "author": "Willian Luis Zuqui",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "npm run build && electron .",
     "start": "electron .",
-    "dist": "npm run build && electron-packager . \"Status Widget\" --platform=win32 --arch=x64 --out=dist-release --overwrite --ignore=dist-release --ignore=src/.*\\.ts$ --ignore=\\.env$ --ignore=\\.env\\.example$"
+    "dist": "npm run build && electron-builder --win msi"
   },
   "build": {
     "appId": "com.ustudio.statuswidget",
@@ -20,10 +21,13 @@
       "dist/**/*",
       "src/index.html",
       "src/styles.css",
+      "src/config.html",
       "package.json"
     ],
     "win": {
-      "target": "dir"
+      "icon": "icone.png",
+      "target": "msi",
+      "signAndEditExecutable": false
     }
   },
   "dependencies": {
