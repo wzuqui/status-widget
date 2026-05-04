@@ -1,13 +1,14 @@
-import { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, Menu, Tray, ipcMain, dialog, nativeImage } from 'electron';
 import path from 'node:path';
 
 import { claudeService } from './claude.service';
-import { loadEnvFile } from './config';
+import { loadEnvFile, readEnvConfig, writeEnvConfig } from './config';
 import { openAIService } from './openai.service';
 
 type CardId = 'claude' | 'codex';
 
 let mainWindow: BrowserWindow | null = null;
+let configWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 
@@ -56,10 +57,38 @@ function createWindow(): void {
   mainWindow.loadFile(path.join(__dirname, '../src/index.html'));
 }
 
+function openConfigWindow(): void {
+  if (configWindow) {
+    configWindow.focus();
+    return;
+  }
+
+  configWindow = new BrowserWindow({
+    width: 460,
+    height: 420,
+    resizable: false,
+    frame: true,
+    title: 'Configurar',
+    backgroundColor: '#0f1115',
+    parent: mainWindow ?? undefined,
+    modal: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'config-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  configWindow.setMenuBarVisibility(false);
+  configWindow.loadFile(path.join(__dirname, '../src/config.html'));
+  configWindow.on('closed', () => {
+    configWindow = null;
+  });
+}
+
 function createTray(): void {
-  const icon = nativeImage.createFromDataURL(
-    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHJ4PSI1NiIgZmlsbD0iIzBmMTExNSIvPjxyZWN0IHg9IjQ0IiB5PSI1MiIgd2lkdGg9IjE2OCIgaGVpZ2h0PSIxNTIiIHJ4PSIyNCIgZmlsbD0iIzExMTUyMiIgc3Ryb2tlPSIjMmEzMTQ0IiBzdHJva2Utd2lkdGg9IjEyIi8+PHRleHQgeD0iMTI4IiB5PSIxMTgiIGZpbGw9IiNmNGY3ZmYiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JTwvdGV4dD48dGV4dCB4PSIxMjgiIHk9IjE2NSIgZmlsbD0iIzdmZDFmZiIgZm9udC1zaXplPSIzMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj41czwvdGV4dD48L3N2Zz4=',
-  );
+  const iconPath = path.join(app.getAppPath(), 'icone.png');
+  const icon = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(icon.resize({ width: 16, height: 16 }));
   tray.setToolTip('Status Widget');
@@ -76,6 +105,11 @@ function createTray(): void {
         click: (menuItem) => {
           mainWindow?.setAlwaysOnTop(menuItem.checked, 'screen-saver');
         },
+      },
+      { type: 'separator' },
+      {
+        label: 'Configurar',
+        click: openConfigWindow,
       },
       { type: 'separator' },
       {
@@ -139,4 +173,27 @@ ipcMain.handle('status:get', async (_event, id: CardId) => {
   }
 
   throw new Error(`Unknown status id: ${id}`);
+});
+
+ipcMain.handle('config:get', () => {
+  return readEnvConfig();
+});
+
+ipcMain.handle('config:selectFile', async () => {
+  const result = await dialog.showOpenDialog({
+    title: 'Selecionar auth.json',
+    filters: [{ name: 'JSON', extensions: ['json'] }],
+    properties: ['openFile'],
+  });
+
+  return result.canceled ? null : result.filePaths[0] ?? null;
+});
+
+ipcMain.handle('config:save', (_event, data: Record<string, string>) => {
+  writeEnvConfig(data);
+  configWindow?.close();
+});
+
+ipcMain.on('config:cancel', () => {
+  configWindow?.close();
 });
