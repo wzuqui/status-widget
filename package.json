@@ -31,6 +31,10 @@
       "icon": "icone.png",
       "target": "msi",
       "signAndEditExecutable": false
+    },
+    "linux": {
+      "icon": "icone.png",
+      "target": "AppImage"
     }
   },
   "dependencies": {
