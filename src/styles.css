@@ -65,6 +65,11 @@ body[data-card-count="1"] .card {
   height: min(72vw, 72vh);
 }
 
+body[data-card-count="3"] .card {
+  width: min(28vw, 72vh);
+  height: min(28vw, 72vh);
+}
+
 .title {
   width: 100%;
   color: #8f9bb7;

@@ -1,10 +1,10 @@
 type StatusWidgetApi = {
   close: () => void;
   getCards: () => Promise<CardId[]>;
-  getStatus: (id: 'claude' | 'codex') => Promise<StatusResponse>;
+  getStatus: (id: 'claude' | 'codex' | 'opencodego') => Promise<StatusResponse>;
 };
 
-type CardId = 'claude' | 'codex';
+type CardId = 'claude' | 'codex' | 'opencodego';
 
 type StatusResponse = {
   texto?: string;
@@ -59,6 +59,12 @@ const allCards: Record<CardId, StatusCard> = {
     secondaryPercentField: 'secondaryWindowUsedPercent',
     secondaryIndicatorField: 'secondaryWindowIndicator',
     secondaryResetField: 'secondaryWindowReset_at',
+  },
+  opencodego: {
+    id: 'opencodego',
+    title: '.: OpenCodeGo :.',
+    percentField: 'usedPercent',
+    resetField: 'reset_at',
   },
 };
 

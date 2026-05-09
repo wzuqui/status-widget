@@ -4,8 +4,9 @@ import path from 'node:path';
 import { claudeService } from './claude.service';
 import { loadEnvFile, readEnvConfig, writeEnvConfig } from './config';
 import { openAIService } from './openai.service';
+import { openCodeGoService } from './opencodego.service';
 
-type CardId = 'claude' | 'codex';
+type CardId = 'claude' | 'codex' | 'opencodego';
 
 let mainWindow: BrowserWindow | null = null;
 let configWindow: BrowserWindow | null = null;
@@ -19,20 +20,20 @@ function getEnabledCards(): CardId[] {
   const cards = rawCards
     .split(',')
     .map((card) => card.trim().toLowerCase())
-    .filter((card): card is CardId => card === 'claude' || card === 'codex');
+    .filter((card): card is CardId => card === 'claude' || card === 'codex' || card === 'opencodego');
 
   return cards.length > 0 ? Array.from(new Set(cards)) : ['claude', 'codex'];
 }
 
 function createWindow(): void {
   const enabledCards = getEnabledCards();
-  const width = enabledCards.length === 1 ? 142 : 252;
+  const width = enabledCards.length === 1 ? 142 : enabledCards.length === 2 ? 252 : 362;
   const height = 122;
 
   mainWindow = new BrowserWindow({
     width,
     height,
-    minWidth: enabledCards.length === 1 ? 100 : 170,
+    minWidth: enabledCards.length === 1 ? 100 : enabledCards.length === 2 ? 170 : 260,
     minHeight: 82,
     frame: false,
     resizable: true,
@@ -187,6 +188,10 @@ ipcMain.handle('status:get', async (_event, id: CardId) => {
 
   if (id === 'codex') {
     return openAIService.getPrimaryWindowUsage();
+  }
+
+  if (id === 'opencodego') {
+    return openCodeGoService.getFiveHourUsage();
   }
 
   throw new Error(`Unknown status id: ${id}`);
