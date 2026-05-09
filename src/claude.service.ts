@@ -1,29 +1,45 @@
 type ClaudeUsageResponse = {
   five_hour?: {
     utilization?: number;
+    reset_at?: string;
     resets_at?: string;
+  };
+  seven_day?: {
+    utilization?: number;
+    reset_at?: string;
   };
 };
 
 export type ClaudeUsage = {
   utilization: number;
+  sevenDayUtilization: number;
   resets_at: string | null;
+  sevenDayReset_at: string | null;
   indicator: string;
+  sevenDayIndicator: string;
 };
 
 export class ClaudeService {
   async getFiveHourUsage(): Promise<ClaudeUsage> {
     const data = await this.fetchUsage();
     const utilization = data.five_hour?.utilization;
+    const sevenDayUtilization = data.seven_day?.utilization;
 
     if (typeof utilization !== 'number') {
       throw new Error('five_hour.utilization was not found in Claude response');
     }
 
+    if (typeof sevenDayUtilization !== 'number') {
+      throw new Error('seven_day.utilization was not found in Claude response');
+    }
+
     return {
       utilization,
-      resets_at: data.five_hour?.resets_at ?? null,
+      sevenDayUtilization,
+      resets_at: data.five_hour?.reset_at ?? data.five_hour?.resets_at ?? null,
       indicator: getUsageIndicator(utilization),
+      sevenDayReset_at: data.seven_day?.reset_at ?? null,
+      sevenDayIndicator: getUsageIndicator(sevenDayUtilization),
     };
   }
 

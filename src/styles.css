@@ -20,7 +20,11 @@ body {
   justify-content: center;
   padding: clamp(6px, 6vmin, 18px);
   background:
-    radial-gradient(circle at 50% -20%, rgba(68, 83, 122, 0.32), transparent 42%),
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(68, 83, 122, 0.32),
+      transparent 42%
+    ),
     linear-gradient(145deg, #151821, #0a0c11 72%);
   -webkit-app-region: drag;
 }
@@ -45,8 +49,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: clamp(5px, 4vmin, 14px) clamp(4px, 3vmin, 12px) clamp(4px, 3vmin, 10px);
+  justify-content: space-between;
+  padding: clamp(5px, 4vmin, 14px) clamp(4px, 3vmin, 12px)
+    clamp(4px, 3vmin, 10px);
   border: clamp(1px, 1vmin, 3px) solid #2a3144;
   border-radius: clamp(8px, 4vmin, 18px);
   background: linear-gradient(145deg, #151a28, #0b0f17);
@@ -69,13 +74,21 @@ body[data-card-count="1"] .card {
   white-space: nowrap;
 }
 
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
 .usage {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(1px, 1.6vmin, 6px);
   min-height: 0;
-  margin-top: clamp(1px, 2vmin, 8px);
+  margin-top: clamp(1px, 1.2vmin, 4px);
   font-size: clamp(12px, 10.5vmin, 34px);
   font-weight: 700;
   line-height: 1.15;
@@ -85,6 +98,13 @@ body[data-card-count="1"] .card {
 .indicator {
   font-size: clamp(10px, 8vmin, 26px);
   line-height: 1.1;
+}
+
+.metric-divider {
+  width: min(70%, 72px);
+  height: 1px;
+  margin: clamp(2px, 1.4vmin, 5px) 0;
+  background: rgba(143, 155, 183, 0.28);
 }
 
 .reset {
@@ -97,14 +117,6 @@ body[data-card-count="1"] .card {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.footer {
-  margin-top: auto;
-  color: #7fd1ff;
-  font-size: clamp(7px, 5.5vmin, 16px);
-  font-weight: 700;
-  line-height: 1.1;
 }
 
 .close {

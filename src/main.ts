@@ -43,11 +43,26 @@ function createWindow(): void {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
+      devTools: true,
       nodeIntegration: false,
     },
   });
 
   mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
+      event.preventDefault();
+      mainWindow?.webContents.toggleDevTools();
+    }
+  });
+  mainWindow.webContents.on('context-menu', (_event, params) => {
+    Menu.buildFromTemplate([
+      {
+        label: 'Inspecionar elemento',
+        click: () => mainWindow?.webContents.inspectElement(params.x, params.y),
+      },
+    ]).popup({ window: mainWindow ?? undefined });
+  });
   mainWindow.on('close', (event) => {
     if (isQuitting) return;
 

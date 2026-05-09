@@ -6,6 +6,10 @@ type OpenAIUsageResponse = {
       used_percent?: number;
       reset_at?: number;
     };
+    secondary_window?: {
+      used_percent?: number;
+      reset_at?: number;
+    };
   };
 };
 
@@ -17,24 +21,36 @@ type OpenCodeAuth = {
 
 export type OpenAIUsage = {
   usedPercent: number;
+  secondaryWindowUsedPercent: number;
   reset_at: string | null;
+  secondaryWindowReset_at: string | null;
   indicator: string;
+  secondaryWindowIndicator: string;
 };
 
 export class OpenAIService {
   async getPrimaryWindowUsage(): Promise<OpenAIUsage> {
     const data = await this.fetchUsage();
     const primaryWindow = data.rate_limit?.primary_window;
+    const secondaryWindow = data.rate_limit?.secondary_window;
     const usedPercent = primaryWindow?.used_percent;
+    const secondaryWindowUsedPercent = secondaryWindow?.used_percent;
 
     if (typeof usedPercent !== 'number') {
       throw new Error('rate_limit.primary_window.used_percent was not found in OpenAI response');
     }
 
+    if (typeof secondaryWindowUsedPercent !== 'number') {
+      throw new Error('rate_limit.secondary_window.used_percent was not found in OpenAI response');
+    }
+
     return {
       usedPercent,
+      secondaryWindowUsedPercent,
       reset_at: primaryWindow?.reset_at ? new Date(primaryWindow.reset_at * 1000).toISOString() : null,
+      secondaryWindowReset_at: secondaryWindow?.reset_at ? new Date(secondaryWindow.reset_at * 1000).toISOString() : null,
       indicator: getUsageIndicator(usedPercent),
+      secondaryWindowIndicator: getUsageIndicator(secondaryWindowUsedPercent),
     };
   }
 

@@ -9,7 +9,13 @@ type CardId = 'claude' | 'codex';
 type StatusResponse = {
   texto?: string;
   utilization?: number;
+  sevenDayUtilization?: number;
+  sevenDayReset_at?: string;
+  sevenDayIndicator?: string;
   usedPercent?: number;
+  secondaryWindowUsedPercent?: number;
+  secondaryWindowReset_at?: string;
+  secondaryWindowIndicator?: string;
   resets_at?: string;
   reset_at?: string;
   indicator?: string;
@@ -21,7 +27,11 @@ type StatusCard = {
   id: CardId;
   title: string;
   percentField: 'utilization' | 'usedPercent';
+  indicatorField: 'indicator';
   resetField: 'resets_at' | 'reset_at';
+  secondaryPercentField: 'sevenDayUtilization' | 'secondaryWindowUsedPercent';
+  secondaryIndicatorField: 'sevenDayIndicator' | 'secondaryWindowIndicator';
+  secondaryResetField: 'sevenDayReset_at' | 'secondaryWindowReset_at';
 };
 
 declare interface Window {
@@ -34,13 +44,21 @@ const allCards: Record<CardId, StatusCard> = {
     id: 'claude',
     title: '.: Claude :.',
     percentField: 'utilization',
+    indicatorField: 'indicator',
     resetField: 'resets_at',
+    secondaryPercentField: 'sevenDayUtilization',
+    secondaryIndicatorField: 'sevenDayIndicator',
+    secondaryResetField: 'sevenDayReset_at',
   },
   codex: {
     id: 'codex',
     title: '.: Codex :.',
     percentField: 'usedPercent',
+    indicatorField: 'indicator',
     resetField: 'reset_at',
+    secondaryPercentField: 'secondaryWindowUsedPercent',
+    secondaryIndicatorField: 'secondaryWindowIndicator',
+    secondaryResetField: 'secondaryWindowReset_at',
   },
 };
 
@@ -92,9 +110,12 @@ function setCardLoading(card: StatusCard): void {
 
   root.classList.remove('error');
   root.querySelector('[data-title]')!.textContent = card.title;
-  root.querySelector('[data-percent]')!.textContent = '--%';
+  root.querySelector('[data-percent]')!.textContent = '-- %';
   root.querySelector('[data-indicator]')!.textContent = '...';
   root.querySelector('[data-reset]')!.textContent = 'buscando';
+  root.querySelector('[data-secondary-percent]')!.textContent = '-- %';
+  root.querySelector('[data-secondary-indicator]')!.textContent = '...';
+  root.querySelector('[data-secondary-reset]')!.textContent = 'buscando';
 }
 
 function setCardError(card: StatusCard, message: string): void {
@@ -106,6 +127,9 @@ function setCardError(card: StatusCard, message: string): void {
   root.querySelector('[data-percent]')!.textContent = 'OFF';
   root.querySelector('[data-indicator]')!.textContent = '!';
   root.querySelector('[data-reset]')!.textContent = message.slice(0, 14);
+  root.querySelector('[data-secondary-percent]')!.textContent = 'OFF';
+  root.querySelector('[data-secondary-indicator]')!.textContent = '!';
+  root.querySelector('[data-secondary-reset]')!.textContent = message.slice(0, 14);
 }
 
 function setCardStatus(card: StatusCard, payload: StatusResponse): void {
@@ -115,15 +139,22 @@ function setCardStatus(card: StatusCard, payload: StatusResponse): void {
   const fallback = parseTextFallback(payload.texto);
   const rawPercent = payload[card.percentField];
   const percent = typeof rawPercent === 'number' ? rawPercent : fallback.percent;
+  const secondaryPercent = payload[card.secondaryPercentField];
   const resetValue = payload[card.resetField];
   const resetText = resetValue ? formatTimeRemaining(resetValue) : fallback.reset || '--';
-  const indicator = payload.indicator || fallback.indicator || (typeof percent === 'number' ? getIndicator(percent) : '--');
+  const secondaryResetValue = payload[card.secondaryResetField];
+  const secondaryResetText = secondaryResetValue ? formatTimeRemaining(secondaryResetValue) : '--';
+  const indicator = payload[card.indicatorField] || fallback.indicator || (typeof percent === 'number' ? getIndicator(percent) : '--');
+  const secondaryIndicator = payload[card.secondaryIndicatorField] || (typeof secondaryPercent === 'number' ? getIndicator(secondaryPercent) : '--');
 
   root.classList.remove('error');
   root.querySelector('[data-title]')!.textContent = card.title;
-  root.querySelector('[data-percent]')!.textContent = typeof percent === 'number' ? `${Math.round(percent)}%` : '--%';
+  root.querySelector('[data-percent]')!.textContent = typeof percent === 'number' ? `${Math.round(percent)} %` : '-- %';
   root.querySelector('[data-indicator]')!.textContent = indicator;
   root.querySelector('[data-reset]')!.textContent = resetText;
+  root.querySelector('[data-secondary-percent]')!.textContent = typeof secondaryPercent === 'number' ? `${Math.round(secondaryPercent)} %` : '-- %';
+  root.querySelector('[data-secondary-indicator]')!.textContent = secondaryIndicator;
+  root.querySelector('[data-secondary-reset]')!.textContent = secondaryResetText;
 }
 
 function buildCard(card: StatusCard): HTMLElement {
@@ -132,12 +163,21 @@ function buildCard(card: StatusCard): HTMLElement {
   section.dataset.card = card.id;
   section.innerHTML = `
     <div class="title" data-title>${card.title}</div>
-    <div class="usage">
-      <span data-percent>--%</span>
-      <span class="indicator" data-indicator>...</span>
+    <div class="metric">
+      <div class="usage">
+        <span data-percent>-- %</span>
+        <span class="indicator" data-indicator>...</span>
+      </div>
+      <div class="reset" data-reset>buscando</div>
     </div>
-    <div class="reset" data-reset>buscando</div>
-    <div class="footer">5s</div>
+    <div class="metric-divider"></div>
+    <div class="metric">
+      <div class="usage">
+        <span data-secondary-percent>-- %</span>
+        <span class="indicator" data-secondary-indicator>...</span>
+      </div>
+      <div class="reset" data-secondary-reset>buscando</div>
+    </div>
   `;
 
   return section;
