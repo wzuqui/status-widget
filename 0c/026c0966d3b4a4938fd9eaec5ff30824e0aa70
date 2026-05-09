@@ -1,0 +1,40 @@
+src/styles.css
+  h_4eca365864dc34 52
+  s_c373c7b5423480::t_2783310af446c4 103-107
+  s_c373c7b5423480::t_f2bff952568eeb 108-109
+  s_c373c7b5423480::t_7a8b54d57a94b6 77-84,91
+src/main.ts
+  s_c373c7b5423480::t_de8e7d58b645b9 46,52-65
+src/claude.service.ts
+  s_c373c7b5423480::t_04665cf643c725 9,17,19,41-42
+  s_c373c7b5423480::t_c6e6ddb01e6f2a 4,39
+  s_c373c7b5423480::t_76b52a2dcf5f9b 7-8,10,15,26,32-35,38
+src/renderer.ts
+  s_c373c7b5423480::t_7a2d086dcc3f9d 113,116,152,155,168,176
+  s_c373c7b5423480::t_ced2d8a7c7bfc8 173
+  s_c373c7b5423480::t_f94c09c15c3725 13-14,16-18,30,32-34,47,49-51,57,59-61,117-118,130-132,142,145-148,156-157,166-167,169-172,174-175,177-178
+  s_c373c7b5423480::t_cf1c37c7bfa51b 12
+src/openai.service.ts
+  s_c373c7b5423480::t_3bcc38dc72804a 9-12,24,26,28,35,37,43-46,49,51,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "0c026c0966d3b4a4938fd9eaec5ff30824e0aa70",
+  "prompts": {},
+  "humans": {
+    "h_4eca365864dc34": {
+      "author": "Willian Luis Zuqui <willianluiszuqui@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_c373c7b5423480": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1f5a65a9fffeLkiMYtS9Z5xqDp",
+        "model": "unknown"
+      },
+      "human_author": "Willian Luis Zuqui <willianluiszuqui@gmail.com>"
+    }
+  }
+}
